@@ -1,3 +1,10 @@
+procedure cpp()
+begin
+  commit;
+  pull;
+  push;
+end cpp;
+
 procedure compile_and_resolve_invalids()
 begin
   refresh list_of_invalid_objects
@@ -33,19 +40,17 @@ begin
     exit when the whole development task is complete;
   end loop;
   
-  commit;
-  push;
+  cpp();
   create PR;
   
-  loop
+  while PR.status = 'open' loop
     if PR has new comments then
       for each l_comment in PR loop
         l_comment.resolve();
         compile_and_resolve_invalids();
       end loop;
 
-      commit;
-      push;
+      cpp();
     end if;
 
     exit when PR is closed;
