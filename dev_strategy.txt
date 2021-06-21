@@ -1,0 +1,53 @@
+procedure compile_and_resolve_invalids()
+begin
+  refresh list_of_invalid_objects
+  for each l_file in the list invalid objects loop
+    l_file.fix_errors();
+    l_file.compile();
+  end loop
+end compile_and_resolve_invalids;
+
+procedure main()
+begin
+  task.status := 'in progress';
+  create-and-check-out a new branch;
+  refresh list_of_invalid_objects;
+  for each file in list_of_invalid_objects loop
+    contact responsible person and try to get them fixed
+  end loop;
+  
+  --actual development starts here:
+  for each l_file involved in your task development loop
+    if l_file.local_version <> l_file.DB_version then
+      if l_file.merge_DB_into_local() is NOT strait forward then
+      --there is ambiguity or doubt of old/massively-changed/obsolete code blocks
+        contact person responsible of l_file and try to clear it out and get the merge possible
+      end if;
+      
+      l_file.merge_DB_into_local();
+      compile_and_resolve_invalids();
+    end if;
+    
+    apply code changes on l_file.local_version; --in context of your task development
+    compile_and_resolve_invalids();
+    exit when the whole development task is complete;
+  end loop;
+  
+  commit;
+  push;
+  create PR;
+  
+  loop
+    if PR has new comments then
+      for each l_comment in PR loop
+        l_comment.resolve();
+        compile_and_resolve_invalids();
+      end loop;
+
+      commit;
+      push;
+    end if;
+
+    exit when PR is closed;
+  end loop;
+end main;
